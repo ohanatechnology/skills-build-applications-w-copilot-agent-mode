@@ -1,3 +1,4 @@
+import { Types } from 'mongoose';
 import { connectDatabase, disconnectDatabase } from '../config/database.js';
 import { Activity, Team, User, Workout } from '../models/index.js';
 
@@ -32,16 +33,19 @@ export async function seed() {
     const mona = await upsertDemoUser('Mona', 'mona@example.com', octocats._id, 'endurance');
     const hubot = await upsertDemoUser('Hubot', 'hubot@example.com', robocats._id, 'strength');
 
-    const monaRunAt = new Date('2026-01-10T12:00:00.000Z');
-    const hubotCycleAt = new Date('2026-01-11T12:00:00.000Z');
+    const monaRunAt = new Date();
+    monaRunAt.setUTCHours(12, 0, 0, 0);
+    monaRunAt.setUTCDate(monaRunAt.getUTCDate() - 2);
+    const hubotStrengthAt = new Date(monaRunAt);
+    hubotStrengthAt.setUTCDate(hubotStrengthAt.getUTCDate() + 1);
     await Activity.updateOne(
-      { user: mona._id, team: octocats._id, type: 'run', occurredAt: monaRunAt },
+      { _id: new Types.ObjectId('64b000000000000000000001') },
       { $set: { user: mona._id, team: octocats._id, type: 'run', minutes: 40, points: 40, occurredAt: monaRunAt } },
       { upsert: true },
     );
     await Activity.updateOne(
-      { user: hubot._id, team: robocats._id, type: 'cycle', occurredAt: hubotCycleAt },
-      { $set: { user: hubot._id, team: robocats._id, type: 'cycle', minutes: 25, points: 25, occurredAt: hubotCycleAt } },
+      { _id: new Types.ObjectId('64b000000000000000000002') },
+      { $set: { user: hubot._id, team: robocats._id, type: 'strength', minutes: 25, points: 25, occurredAt: hubotStrengthAt } },
       { upsert: true },
     );
     await Workout.updateOne(

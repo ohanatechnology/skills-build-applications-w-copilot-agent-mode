@@ -28,22 +28,20 @@ OctoFit Tracker is a three-tier application for a school fitness program. The st
 
 ## Implementation decisions
 
-Record your plan here before editing code.
-
-- Presentation tier decision:
-- Logic tier decision:
-- Data tier decision:
-- Activity tracking approach:
-- Team management approach:
-- Leaderboard approach:
-- Workout suggestions approach:
+- Presentation tier decision: Route components load their own contract endpoint through the shared client, using relative `/api` paths and accessible loading, empty, and error states.
+- Logic tier decision: Keep validation and business behavior in explicit services; reject invalid payloads and missing references with 4xx responses.
+- Data tier decision: Require the contract fields in Mongoose, preserve team names and mascots, and seed recent demo activities with stable upsert IDs.
+- Activity tracking approach: Accept `userId`, `teamId`, `type`, and positive `minutes`; store user/team references, one point per minute, and the creation time.
+- Team management approach: Require non-empty names and mascots; default members to an empty array.
+- Leaderboard approach: Sum activity points per team, include teams with no activity at zero, sort descending, then assign 1-based ranks.
+- Workout suggestions approach: Match a user's most common recent activity focus first, fall back to their fitness goal, and explain the recommendation.
 
 ## Test plan
 
 Record the commands you run and what each failure means.
 
-- Data-tier command: `npm run test:data --prefix octofit-tracker/backend`
-- API command: `npm run test:api --prefix octofit-tracker/backend`
-- Frontend command: `npm test --prefix octofit-tracker/frontend`
-- Backend build command: `npm run build --prefix octofit-tracker/backend`
-- Frontend build command: `npm run build --prefix octofit-tracker/frontend`
+- Data-tier command: `npm run test:data --prefix octofit-tracker/backend` — schema assertions pass; the seed integration test is blocked because MongoMemoryServer cannot download MongoDB in this environment.
+- API command: `npm run test:api --prefix octofit-tracker/backend` — blocked before API assertions for the same MongoDB download restriction.
+- Frontend command: `npm test --prefix octofit-tracker/frontend` — passed (15 tests).
+- Backend build command: `npm run build --prefix octofit-tracker/backend` — passed.
+- Frontend build command: `npm run build --prefix octofit-tracker/frontend` — passed.
